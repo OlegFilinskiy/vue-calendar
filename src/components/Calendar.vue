@@ -10,6 +10,12 @@
           <v-btn fab text small @click.prevent="next" class="mr-4">
             <v-icon small>mdi-chevron-right</v-icon>
           </v-btn>
+          <v-btn color="primary" class="mr-4" @click.prevent="dialog = true" dark>
+            Добавить
+          </v-btn>
+          <v-btn color="#8cc6ff" class="mr-4" @click.prevent="getEvents">
+            Обновить
+          </v-btn>
           <v-btn outlined class="mr-4" @click.prevent="setToday">
             Сегодня
           </v-btn>
@@ -43,6 +49,56 @@
         </v-toolbar>
       </v-sheet>
       <!-- Toolbar end -->
+
+      <!-- Dialog -->
+      <v-dialog v-model="dialog" max-width="500">
+        <v-card>
+          <v-container>
+            <v-form @submit.prevent="addEvent">
+              <v-text-field
+                  v-model="name"
+                  type="text"
+                  label="Название обяз."
+                  required
+              ></v-text-field>
+              <v-text-field
+                  v-model="details"
+                  type="text"
+                  label="Описание"
+              ></v-text-field>
+              <v-text-field
+                  v-model="start"
+                  type="date"
+                  label="Начало обяз."
+                  required
+              ></v-text-field>
+              <v-text-field
+                  v-model="end"
+                  type="date"
+                  label="Конец обяз."
+                  required
+              ></v-text-field>
+              <v-text-field
+                  v-model="color"
+                  type="color"
+                  label="Цвет"
+              ></v-text-field>
+              <v-btn
+                  type="submit"
+                  color="primary"
+                  class="mt-4"
+                  @click.stop="dialog = false"
+              >Создать</v-btn>
+              <v-btn
+                  type="button"
+                  class="mt-4 ml-3"
+                  @click.stop="dialog = false"
+              >Закрыть</v-btn>
+            </v-form>
+          </v-container>
+        </v-card>
+      </v-dialog>
+      <!-- Dialog end -->
 
       <!-- Calendar -->
       <v-sheet height="600">
@@ -217,6 +273,23 @@
         this.events = newDB
         localStorage.setItem('events', JSON.stringify(newDB))
       },
+      addEvent() {
+        if (this.name && this.start && this.end) {
+          this.events.push({
+            name: this.name,
+            details: this.details,
+            start: this.start,
+            end: this.end,
+            color: this.color
+          })
+
+          localStorage.setItem('events', JSON.stringify(this.events))
+          this.events = JSON.parse(localStorage.getItem('events'))
+          this.clearDialogForm()
+        } else {
+          alert('Название, начало и конец обязательные поля')
+        }
+      },
       updateEvent(event) {
         this.events.find(ev => ev.id === this.currentlyEditing).details = event.details
 
@@ -275,6 +348,13 @@
         // You could load events from an outside source (like database) now that we have the start and end dates on the calendar
         this.start = start
         this.end = end
+      },
+      clearDialogForm () {
+        this.name = ''
+        this.details = ''
+        this.start = null
+        this.end = null
+        this.color = null
       },
     }
   }
