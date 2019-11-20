@@ -4,13 +4,13 @@
       <!-- Toolbar -->
       <v-sheet height="64">
         <v-toolbar flat color="white">
-          <v-btn fab text small @click="prev">
+          <v-btn fab text small @click.prevent="prev">
             <v-icon small>mdi-chevron-left</v-icon>
           </v-btn>
-          <v-btn fab text small @click="next" class="mr-4">
+          <v-btn fab text small @click.prevent="next" class="mr-4">
             <v-icon small>mdi-chevron-right</v-icon>
           </v-btn>
-          <v-btn outlined class="mr-4" @click="setToday">
+          <v-btn outlined class="mr-4" @click.prevent="setToday">
             Сегодня
           </v-btn>
           <v-toolbar-title>{{ title }}</v-toolbar-title>
@@ -83,16 +83,34 @@
               <v-spacer></v-spacer>
             </v-toolbar>
             <v-card-text>
-              <span v-html="selectedEvent.details"></span>
+              <!--<span v-html="selectedEvent.details"></span>-->
+              <form v-if="currentlyEditing !== selectedEvent.id">
+                {{ selectedEvent.details }}
+              </form>
+              <form v-else>
+                <textarea
+                    v-model="selectedEvent.details"
+                    style="width: 100%; height: 100%; min-height: 100px;"
+                    placeholder="Добавить описание"
+                ></textarea>
+              </form>
             </v-card-text>
             <v-card-actions>
               <v-btn
                   text
                   color="secondary"
-                  @click="selectedOpen = false"
-              >
-                Закрыть
-              </v-btn>
+                  @click.prevent="selectedOpen = false"
+              >Закрыть</v-btn>
+              <v-btn
+                  text
+                  @click.prevent="editEvent(selectedEvent)"
+                  v-if="currentlyEditing !== selectedEvent.id"
+              >Редактировать</v-btn>
+              <v-btn
+                  text
+                  @click.prevent="updateEvent(selectedEvent)"
+                  v-else
+              >Сохранить</v-btn>
             </v-card-actions>
           </v-card>
         </v-menu>
@@ -149,8 +167,8 @@
         const endYear = end.year
         const suffixYear = startYear === endYear ? '' : endYear
 
-        const startDay = start.day + this.nth(start.day)
-        const endDay = end.day + this.nth(end.day)
+        const startDay = `${start.day}-e`
+        const endDay = `${end.day}-e`
 
         switch (this.type) {
           case 'month':
@@ -171,24 +189,52 @@
     },
     mounted() {
       this.getEvents()
-      // window.console.log(this.events)
     },
     methods: {
       getEvents() {
         let newDB = db.map(event => {
           let newEvent = {...event}
 
-          newEvent.name = event.title
-          newEvent.start = event.date
-          newEvent.end = event.date
-          newEvent.details = event.participants
-          newEvent.color = "#00BCD4"
+          if (!event.name) {
+            newEvent.name = event.title
+          }
+          if (!event.start) {
+            newEvent.start = event.date
+          }
+          if (!event.end) {
+            newEvent.end = event.date
+          }
+          if (!event.details) {
+            newEvent.details = event.participants
+          }
+          if (!event.color) {
+            newEvent.color = "#00BCD4"
+          }
 
           return newEvent
         })
 
         this.events = newDB
         localStorage.setItem('events', JSON.stringify(newDB))
+      },
+      updateEvent(event) {
+        this.events.find(ev => ev.id === this.currentlyEditing).details = event.details
+
+        localStorage.setItem('events', JSON.stringify(this.events))
+        this.events = JSON.parse(localStorage.getItem('events'))
+
+        this.selectedOpen = false
+        this.currentlyEditing = null
+      },
+      deleteEvent(event) {
+        const idx = this.events.findIndex(ev => ev.id === event)
+        this.events.splice(idx, 1)
+
+        localStorage.setItem('events', JSON.stringify(this.events))
+        this.events = JSON.parse(localStorage.getItem('events'))
+
+        this.selectedOpen = false
+        this.currentlyEditing = null
       },
       viewDay ({ date }) {
         this.focus = date
@@ -222,15 +268,13 @@
 
         nativeEvent.stopPropagation()
       },
+      editEvent(event) {
+        this.currentlyEditing = event.id
+      },
       updateRange ({ start, end }) {
         // You could load events from an outside source (like database) now that we have the start and end dates on the calendar
         this.start = start
         this.end = end
-      },
-      nth (d) {
-        return d > 3 && d < 21
-            ? '-е'
-            : ['-е', '-е', '-е', '-е', '-е', '-е', '-е', '-е', '-е', '-е'][d % 10]
       },
     }
   }
