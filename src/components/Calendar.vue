@@ -4,14 +4,14 @@
       <!-- Toolbar -->
       <v-sheet height="64">
         <v-toolbar flat color="white">
-          <v-btn outlined class="mr-4" @click="setToday">
-            Today
-          </v-btn>
           <v-btn fab text small @click="prev">
             <v-icon small>mdi-chevron-left</v-icon>
           </v-btn>
-          <v-btn fab text small @click="next" class="mr-3">
+          <v-btn fab text small @click="next" class="mr-4">
             <v-icon small>mdi-chevron-right</v-icon>
+          </v-btn>
+          <v-btn outlined class="mr-4" @click="setToday">
+            Сегодня
           </v-btn>
           <v-toolbar-title>{{ title }}</v-toolbar-title>
           <v-spacer></v-spacer>
@@ -27,13 +27,16 @@
             </template>
             <v-list>
               <v-list-item @click="type = 'day'">
-                <v-list-item-title>Day</v-list-item-title>
+                <v-list-item-title>День</v-list-item-title>
               </v-list-item>
               <v-list-item @click="type = 'week'">
-                <v-list-item-title>Week</v-list-item-title>
+                <v-list-item-title>Неделя</v-list-item-title>
               </v-list-item>
               <v-list-item @click="type = 'month'">
-                <v-list-item-title>Month</v-list-item-title>
+                <v-list-item-title>Месяц</v-list-item-title>
+              </v-list-item>
+              <v-list-item @click="type = '4day'">
+                <v-list-item-title>4 Дня</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -48,10 +51,11 @@
             v-model="focus"
             color="primary"
             :events="events"
-            :event-color="'#00BCD4'"
+            :event-color="getEventColor"
             :event-margin-bottom="3"
             :now="today"
             :type="type"
+            :locale="locale"
             @click:event="showEvent"
             @click:more="viewDay"
             @click:date="viewDay"
@@ -69,20 +73,14 @@
               flat
           >
             <v-toolbar
-                :color="'#00BCD4'"
+                :color="selectedEvent.color"
                 dark
             >
-              <v-btn icon>
-                <v-icon>mdi-pencil</v-icon>
+              <v-btn @click="deleteEvent(selectedEvent.id)" icon>
+                <v-icon>mdi-delete</v-icon>
               </v-btn>
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
-              <v-btn icon>
-                <v-icon>mdi-heart</v-icon>
-              </v-btn>
-              <v-btn icon>
-                <v-icon>mdi-dots-vertical</v-icon>
-              </v-btn>
             </v-toolbar>
             <v-card-text>
               <span v-html="selectedEvent.details"></span>
@@ -93,7 +91,7 @@
                   color="secondary"
                   @click="selectedOpen = false"
               >
-                Cancel
+                Закрыть
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -109,20 +107,21 @@
 
   export default {
     data: () => ({
-      today: new Date().toISOString(),
-      focus: new Date().toISOString(),
+      today: new Date().toISOString().substr(0, 10),
+      focus: new Date().toISOString().substr(0, 10),
       type: "month",
+      locale: "ru",
       typeToLabel: {
-        month: "Month",
-        week: "Week",
-        day: "Day"
+        month: "Месяц",
+        week: "Неделя",
+        day: "День",
+        '4day': "4 Дня"
       },
-      title: null,
       date: null,
       participants: [],
       name: null,
       details: null,
-      start: null,
+      start: new Date(),
       end: null,
       color: "#00BCD4",
       currentlyEditing: null,
@@ -133,37 +132,42 @@
       dialog: false
     }),
     computed: {
-      // title () {
-      //   const { start, end } = this
-      //   if (!start || !end) {
-      //     return ''
-      //   }
-      //
-      //   const startMonth = this.monthFormatter(start)
-      //   const endMonth = this.monthFormatter(end)
-      //   const suffixMonth = startMonth === endMonth ? '' : endMonth
-      //
-      //   const startYear = start.year
-      //   const endYear = end.year
-      //   const suffixYear = startYear === endYear ? '' : endYear
-      //
-      //   const startDay = start.day + this.nth(start.day)
-      //   const endDay = end.day + this.nth(end.day)
-      //
-      //   switch (this.type) {
-      //     case 'month':
-      //       return `${startMonth} ${startYear}`
-      //     case 'week':
-      //     case 'day':
-      //       return `${startMonth} ${startDay} ${startYear}`
-      //   }
-      //   return ''
-      // },
-      // monthFormatter () {
-      //   return this.$refs.calendar.getFormatter({
-      //     timeZone: 'UTC', month: 'long',
-      //   })
-      // },
+      title () {
+        const { start, end } = this
+        const monthNames = ["январь", "февраль", "март", "апрель", "май", "июнь",
+          "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"]
+
+        if (!end) {
+          return `${monthNames[start.getMonth()]} ${start.getFullYear()}`
+        }
+
+        const startMonth = this.monthFormatter(start)
+        const endMonth = this.monthFormatter(end)
+        const suffixMonth = startMonth === endMonth ? '' : endMonth
+
+        const startYear = start.year
+        const endYear = end.year
+        const suffixYear = startYear === endYear ? '' : endYear
+
+        const startDay = start.day + this.nth(start.day)
+        const endDay = end.day + this.nth(end.day)
+
+        switch (this.type) {
+          case 'month':
+            return `${startMonth} ${startYear}`
+          case 'week':
+          case '4day':
+            return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`
+          case 'day':
+            return `${startMonth} ${startDay} ${startYear}`
+        }
+        return ''
+      },
+      monthFormatter () {
+        return this.$refs.calendar.getFormatter({
+          timeZone: 'UTC', month: 'long',
+        })
+      },
     },
     mounted() {
       this.getEvents()
@@ -178,7 +182,7 @@
           newEvent.start = event.date
           newEvent.end = event.date
           newEvent.details = event.participants
-          newEvent.color = "'#00BCD4'"
+          newEvent.color = "#00BCD4"
 
           return newEvent
         })
@@ -192,6 +196,9 @@
       },
       setToday () {
         this.focus = this.today
+      },
+      getEventColor (event) {
+        return event.color
       },
       prev () {
         this.$refs.calendar.prev()
@@ -222,8 +229,8 @@
       },
       nth (d) {
         return d > 3 && d < 21
-            ? 'th'
-            : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][d % 10]
+            ? '-е'
+            : ['-е', '-е', '-е', '-е', '-е', '-е', '-е', '-е', '-е', '-е'][d % 10]
       },
     }
   }
