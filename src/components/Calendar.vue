@@ -72,14 +72,14 @@
               ></v-text-field>
               <v-text-field
                   v-model="start"
-                  type="date"
+                  type="datetime-local"
                   label="Начало обяз."
                   required
                   outlined
               ></v-text-field>
               <v-text-field
                   v-model="end"
-                  type="date"
+                  type="datetime-local"
                   label="Конец обяз."
                   required
                   outlined
@@ -202,7 +202,7 @@
       participants: [],
       name: null,
       details: null,
-      start: new Date(),
+      start: null,
       end: null,
       color: "#00BCD4",
       currentlyEditing: null,
@@ -218,8 +218,9 @@
         const monthNames = ["январь", "февраль", "март", "апрель", "май", "июнь",
           "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"]
 
-        if (!end) {
-          return `${monthNames[start.getMonth()]} ${start.getFullYear()}`
+        if (!start || !end) {
+          let dateNow = new Date
+          return `${monthNames[dateNow.getMonth()]} ${dateNow.getFullYear()}`
         }
 
         const startMonth = this.monthFormatter(start)
