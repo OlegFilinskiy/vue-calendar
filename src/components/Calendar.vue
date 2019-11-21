@@ -3,13 +3,7 @@
     <v-col>
       <!-- Toolbar -->
       <v-sheet height="64">
-        <v-toolbar flat color="white">
-          <v-btn fab text small @click.prevent="prev">
-            <v-icon small>mdi-chevron-left</v-icon>
-          </v-btn>
-          <v-btn fab text small @click.prevent="next" class="mr-4">
-            <v-icon small>mdi-chevron-right</v-icon>
-          </v-btn>
+        <v-toolbar color="#F4F4F4">
           <v-btn color="primary" class="mr-4" @click.prevent="dialog = true" dark>
             Добавить
           </v-btn>
@@ -19,6 +13,26 @@
           <v-btn outlined class="mr-4" @click.prevent="setToday">
             Сегодня
           </v-btn>
+          <v-spacer></v-spacer>
+          <v-text-field
+            hide-details
+            prepend-icon="mdi-magnify"
+            single-line
+            label="Событие или дата"
+            outlined
+            dense
+          ></v-text-field>
+        </v-toolbar>
+      </v-sheet>
+      <v-sheet height="64">
+        <v-toolbar flat color="white">
+          <v-btn fab text small @click.prevent="prev">
+            <v-icon small>mdi-chevron-left</v-icon>
+          </v-btn>
+          <v-btn fab text small @click.prevent="next" class="mr-4">
+            <v-icon small>mdi-chevron-right</v-icon>
+          </v-btn>
+
           <v-toolbar-title>{{ title }}</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-menu bottom right>
