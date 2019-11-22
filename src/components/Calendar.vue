@@ -162,14 +162,36 @@
             <v-card-text>
               <!--<span v-html="selectedEvent.details"></span>-->
               <form v-if="currentlyEditing !== selectedEvent.id">
-                {{ selectedEvent.details }}
+                <div>Начало: {{ selectedEvent.start }}</div>
+                <div>Конец: {{ selectedEvent.end }}</div>
+                <div>Описание: {{ selectedEvent.details }}</div>
               </form>
               <form v-else>
-                <textarea
+                <v-text-field
+                    v-model="selectedEvent.name"
+                    type="text"
+                    label="Изменить название"
+                    clearable
+                    outlined
+                ></v-text-field>
+                <v-text-field
+                    v-model="selectedEvent.start"
+                    type="datetime-local"
+                    label="Изменить дату"
+                    outlined
+                ></v-text-field>
+                <v-text-field
+                    v-model="selectedEvent.end"
+                    type="datetime-local"
+                    label="Изменить дату"
+                    outlined
+                ></v-text-field>
+                <v-textarea
                     v-model="selectedEvent.details"
                     style="width: 100%; height: 100%; min-height: 100px;"
-                    placeholder="Добавить описание"
-                ></textarea>
+                    label="Изменить описание"
+                    outlined
+                ></v-textarea>
               </form>
             </v-card-text>
             <v-card-actions>
@@ -318,10 +340,29 @@
         }
       },
       updateEvent(event) {
-        this.events.find(ev => ev.id === this.currentlyEditing).details = event.details
+        const cerEvent = this.events.find(ev => ev.id === this.currentlyEditing)
+        let flag = false
 
-        localStorage.setItem('events', JSON.stringify(this.events))
-        this.events = JSON.parse(localStorage.getItem('events'))
+        if (cerEvent.name !== event.name) {
+          cerEvent.name = event.name
+          flag = true
+        }
+        if (cerEvent.details !== event.details) {
+          cerEvent.details = event.details
+          flag = true
+        }
+        if (cerEvent.start !== event.start) {
+          cerEvent.start = event.start
+          flag = true
+        }
+        if (cerEvent.end !== event.end) {
+          cerEvent.end = event.end
+          flag = true
+        }
+        if (flag) {
+          localStorage.setItem('events', JSON.stringify(this.events))
+          this.events = JSON.parse(localStorage.getItem('events'))
+        }
 
         this.selectedOpen = false
         this.currentlyEditing = null
