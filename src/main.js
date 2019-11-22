@@ -20,7 +20,7 @@ const convertParticipants = (items) => {
   })
 
   arrFromObj.forEach(string => {
-    str += string + " "
+    str += string + ". "
   })
 
   return str
