@@ -293,22 +293,19 @@
     methods: {
       getEvents() {
         let newDB = db.map(event => {
-          event.date = transformDate(event.date)
-          event.participants = convertParticipants(event.participants)
-
           let newEvent = {...event}
 
           if (!event.name) {
             newEvent.name = event.title
           }
           if (!event.start) {
-            newEvent.start = event.date
+            newEvent.start = transformDate(event.date)
           }
           if (!event.end) {
-            newEvent.end = event.date
+            newEvent.end = transformDate(event.date)
           }
           if (!event.details) {
-            newEvent.details = event.participants
+            newEvent.details = convertParticipants(event.participants)
           }
           if (!event.color) {
             newEvent.color = "#00BCD4"
