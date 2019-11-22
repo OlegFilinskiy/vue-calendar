@@ -26,6 +26,11 @@ export const convertParticipants = (items) => {
   return str
 }
 
+export const updateLocalStorage = (events) => {
+  localStorage.setItem('events', JSON.stringify(events))
+  this.events = JSON.parse(localStorage.getItem('events'))
+}
+
 new Vue({
   vuetify,
   render: h => h(App)

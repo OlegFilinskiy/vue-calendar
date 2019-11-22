@@ -220,8 +220,7 @@
 </template>
 
 <script>
-  import { db } from '@/main'
-  import { convertParticipants } from '@/main'
+  import { db, convertParticipants, updateLocalStorage } from '@/main'
 
   export default {
     data: () => ({
@@ -296,9 +295,6 @@
         let newDB = db.map(event => {
           let newEvent = {...event}
 
-          // window.console.dir(convertParticipants(event.participants))
-          // window.console.dir(typeof event.participants)
-
           if (!event.name) {
             newEvent.name = event.title
           }
@@ -360,8 +356,7 @@
           flag = true
         }
         if (flag) {
-          localStorage.setItem('events', JSON.stringify(this.events))
-          this.events = JSON.parse(localStorage.getItem('events'))
+          updateLocalStorage(this.events)
         }
 
         this.selectedOpen = false
@@ -371,8 +366,7 @@
         const idx = this.events.findIndex(ev => ev.id === event)
         this.events.splice(idx, 1)
 
-        localStorage.setItem('events', JSON.stringify(this.events))
-        this.events = JSON.parse(localStorage.getItem('events'))
+        updateLocalStorage(this.events)
 
         this.selectedOpen = false
         this.currentlyEditing = null
@@ -417,7 +411,6 @@
         this.currentlyEditing = null
       },
       updateRange ({ start, end }) {
-        // You could load events from an outside source (like database) now that we have the start and end dates on the calendar
         this.start = start
         this.end = end
       },
