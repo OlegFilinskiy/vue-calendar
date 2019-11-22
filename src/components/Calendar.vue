@@ -122,7 +122,7 @@
       <!-- Dialog end -->
 
       <!-- Calendar -->
-      <v-sheet height="600">
+      <v-sheet height="82vh">
         <v-calendar
             ref="calendar"
             v-model="focus"
