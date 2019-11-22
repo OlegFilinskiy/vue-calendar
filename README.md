@@ -11,13 +11,13 @@
 ##
 #### Preview application:
 ##### Account page (Home)
-![Screenshot of example](https://github.com/OlegFilinskiy/vue-calendar/tree/src/assets/screenshot_5.png)
+![Screenshot of example](https://github.com/OlegFilinskiy/vue-calendar/blob/master/src/assets/screenshot_5.png)
 ##### Planning page
-![Screenshot of example](https://github.com/OlegFilinskiy/vue-calendar/tree/src/assets/screenshot_6.png)
+![Screenshot of example](https://github.com/OlegFilinskiy/vue-calendar/blob/master/src/assets/screenshot_6.png)
 ##### Category page
-![Screenshot of example](https://github.com/OlegFilinskiy/vue-calendar/tree/src/assets/screenshot_7.png)
+![Screenshot of example](https://github.com/OlegFilinskiy/vue-calendar/blob/master/src/assets/screenshot_7.png)
 ##### History page
-![Screenshot of example](https://github.com/OlegFilinskiy/vue-calendar/tree/src/assets/screenshot_8.png)
+![Screenshot of example](https://github.com/OlegFilinskiy/vue-calendar/blob/master/src/assets/screenshot_8.png)
 
 
 ## Project setup
