@@ -8,9 +8,9 @@ Vue.config.productionTip = false
 let eventsArray = localStorage.getItem('events') ? JSON.parse(localStorage.getItem('events')) : myJson.events
 localStorage.setItem('events', JSON.stringify(eventsArray))
 
-export const db = JSON.parse(localStorage.getItem('events'))
+const db = JSON.parse(localStorage.getItem('events'))
 
-export const convertParticipants = (items) => {
+const convertParticipants = (items) => {
   let str = ''
   let arrFromObj = items.map(item => {
     if (typeof item !== "undefined") {
@@ -26,10 +26,20 @@ export const convertParticipants = (items) => {
   return str
 }
 
-export const updateLocalStorage = (events) => {
+const updateLocalStorage = (events) => {
   localStorage.setItem('events', JSON.stringify(events))
   this.events = JSON.parse(localStorage.getItem('events'))
 }
+
+const transformDate = date => {
+  const dateArray = date.slice().split(' ')
+  const reverceDate = [...dateArray][0].split('-').reverse().join('-')
+  const time = [...dateArray][1] || ''
+
+  return `${reverceDate} ${time}`
+}
+
+export {db, convertParticipants, updateLocalStorage, transformDate}
 
 new Vue({
   vuetify,

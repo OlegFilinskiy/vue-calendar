@@ -220,7 +220,7 @@
 </template>
 
 <script>
-  import { db, convertParticipants, updateLocalStorage } from '@/main'
+  import { db, convertParticipants, updateLocalStorage, transformDate } from '@/main'
 
   export default {
     data: () => ({
@@ -293,6 +293,9 @@
     methods: {
       getEvents() {
         let newDB = db.map(event => {
+          event.date = transformDate(event.date)
+          event.participants = convertParticipants(event.participants)
+
           let newEvent = {...event}
 
           if (!event.name) {
@@ -305,7 +308,7 @@
             newEvent.end = event.date
           }
           if (!event.details) {
-            newEvent.details = convertParticipants(event.participants)
+            newEvent.details = event.participants
           }
           if (!event.color) {
             newEvent.color = "#00BCD4"
