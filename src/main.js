@@ -7,9 +7,24 @@ Vue.config.productionTip = false
 
 let eventsArray = localStorage.getItem('events') ? JSON.parse(localStorage.getItem('events')) : myJson.events
 localStorage.setItem('events', JSON.stringify(eventsArray))
-const data = JSON.parse(localStorage.getItem('events'))
 
-export const db = data
+export const db = JSON.parse(localStorage.getItem('events'))
+
+export const convertParticipants = (items) => {
+  let str = ''
+  let arrFromObj = items.map(item => {
+    if (typeof item !== "undefined") {
+      return `${item['name']} ${item['surname']}`
+    }
+    return ''
+  })
+
+  arrFromObj.forEach(string => {
+    str += string + " "
+  })
+
+  return str
+}
 
 new Vue({
   vuetify,

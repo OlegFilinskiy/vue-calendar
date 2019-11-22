@@ -2,12 +2,12 @@
   <v-row class="fill-height">
     <v-col>
       <!-- Toolbar -->
-      <v-sheet height="64">
+      <v-sheet height="70">
         <v-toolbar color="#F4F4F4">
           <v-btn color="primary" class="mr-4" @click.prevent="dialog = true" dark>
             Добавить
           </v-btn>
-          <v-btn color="#8cc6ff" class="mr-4" @click.prevent="getEvents">
+          <v-btn color="#c1f7c2" class="mr-4" @click.prevent="getEvents">
             Обновить
           </v-btn>
           <v-btn outlined class="mr-4" @click.prevent="setToday">
@@ -24,7 +24,7 @@
           ></v-text-field>
         </v-toolbar>
       </v-sheet>
-      <v-sheet height="64">
+      <v-sheet height="70">
         <v-toolbar flat color="white">
           <v-btn fab text small @click.prevent="prev">
             <v-icon small>mdi-chevron-left</v-icon>
@@ -176,7 +176,7 @@
               <v-btn
                   text
                   color="secondary"
-                  @click.prevent="selectedOpen = false"
+                  @click.prevent="closeEvent"
               >Закрыть</v-btn>
               <v-btn
                   text
@@ -199,6 +199,7 @@
 
 <script>
   import { db } from '@/main'
+  import { convertParticipants } from '@/main'
 
   export default {
     data: () => ({
@@ -245,17 +246,17 @@
         const endYear = end.year
         const suffixYear = startYear === endYear ? '' : endYear
 
-        const startDay = `${start.day}-e`
-        const endDay = `${end.day}-e`
+        const startDay = start.day
+        const endDay = end.day
 
         switch (this.type) {
           case 'month':
             return `${startMonth} ${startYear}`
           case 'week':
           case '4day':
-            return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`
+            return `${startDay} - ${endDay} ${startMonth} ${suffixMonth} ${startYear} ${suffixYear}`
           case 'day':
-            return `${startMonth} ${startDay} ${startYear}`
+            return `${startDay} ${startMonth} ${startYear}`
         }
         return ''
       },
@@ -273,6 +274,9 @@
         let newDB = db.map(event => {
           let newEvent = {...event}
 
+          // window.console.dir(convertParticipants(event.participants))
+          // window.console.dir(typeof event.participants)
+
           if (!event.name) {
             newEvent.name = event.title
           }
@@ -283,7 +287,7 @@
             newEvent.end = event.date
           }
           if (!event.details) {
-            newEvent.details = event.participants
+            newEvent.details = convertParticipants(event.participants)
           }
           if (!event.color) {
             newEvent.color = "#00BCD4"
@@ -298,6 +302,7 @@
       addEvent() {
         if (this.name && this.start && this.end) {
           this.events.push({
+            id: Date.now(),
             name: this.name,
             details: this.details,
             start: this.start,
@@ -366,6 +371,10 @@
       editEvent(event) {
         this.currentlyEditing = event.id
       },
+      closeEvent() {
+        this.selectedOpen = false
+        this.currentlyEditing = null
+      },
       updateRange ({ start, end }) {
         // You could load events from an outside source (like database) now that we have the start and end dates on the calendar
         this.start = start
@@ -381,3 +390,9 @@
     }
   }
 </script>
+
+<style scoped>
+  .v-text-field >>> input[type="color"] {
+      padding: 0;
+  }
+</style>
