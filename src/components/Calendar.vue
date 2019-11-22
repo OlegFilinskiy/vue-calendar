@@ -14,14 +14,41 @@
             Сегодня
           </v-btn>
           <v-spacer></v-spacer>
-          <v-text-field
-            hide-details
-            prepend-icon="mdi-magnify"
-            single-line
-            label="Событие или дата"
-            outlined
-            dense
-          ></v-text-field>
+
+          <!--Search form-->
+          <v-form
+              class="searchForm"
+              width="500"
+          >
+            <v-text-field
+                hide-details
+                prepend-icon="mdi-magnify"
+                single-line
+                label="Событие или дата"
+                outlined
+                dense
+            ></v-text-field>
+
+            <div
+                class="searchBar"
+            >
+              <div class="searchBar__wrapper">
+                <p>
+                  Sed aliquam ultrices mauris. Donec posuere vulputate arcu. Morbi ac felis. Etiam feugiat lorem non metus. Sed a libero.
+                </p>
+
+                <p>
+                  Nam ipsum risus, rutrum vitae, vestibulum eu, molestie vel, lacus. Aenean tellus metus, bibendum sed, posuere ac, mattis non, nunc. Aliquam lobortis. Aliquam lobortis. Suspendisse non nisl sit amet velit hendrerit rutrum.
+                </p>
+
+                <p class="mb-0">
+                  Phasellus dolor. Fusce neque. Fusce fermentum odio nec arcu. Pellentesque libero tortor, tincidunt et, tincidunt eget, semper nec, quam. Phasellus blandit leo ut odio.
+                </p>
+              </div>
+            </div>
+          </v-form>
+          <!--Search form-->
+
         </v-toolbar>
       </v-sheet>
       <v-sheet height="70">
@@ -119,10 +146,34 @@
           </v-container>
         </v-card>
       </v-dialog>
+
+      <v-dialog
+          v-model="errorDialog"
+          max-width="320"
+      >
+        <v-card>
+          <v-card-title class="headline">Не заполнены поля</v-card-title>
+
+          <v-card-text>
+            Поля название, начало и конец должны быть обязательно заполнены
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+                color="green darken-1"
+                text
+                @click="errorDialog = false"
+            >
+              Понятно
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
       <!-- Dialog end -->
 
       <!-- Calendar -->
-      <v-sheet height="600">
+      <v-sheet height="83vh">
         <v-calendar
             ref="calendar"
             v-model="focus"
@@ -246,7 +297,8 @@
       selectedElement: null,
       selectedOpen: false,
       events: [],
-      dialog: false
+      dialog: false,
+      errorDialog: false
     }),
     computed: {
       title () {
@@ -328,31 +380,30 @@
             color: this.color
           })
 
-          localStorage.setItem('events', JSON.stringify(this.events))
-          this.events = JSON.parse(localStorage.getItem('events'))
+          updateLocalStorage(this.events)
           this.clearDialogForm()
         } else {
-          alert('Название, начало и конец обязательные поля')
+          this.errorDialog = true
         }
       },
       updateEvent(event) {
-        const cerEvent = this.events.find(ev => ev.id === this.currentlyEditing)
+        const currentEvent = this.events.find(ev => ev.id === this.currentlyEditing)
         let flag = false
 
-        if (cerEvent.name !== event.name) {
-          cerEvent.name = event.name
+        if (currentEvent.name !== event.name) {
+          currentEvent.name = event.name
           flag = true
         }
-        if (cerEvent.details !== event.details) {
-          cerEvent.details = event.details
+        if (currentEvent.details !== event.details) {
+          currentEvent.details = event.details
           flag = true
         }
-        if (cerEvent.start !== event.start) {
-          cerEvent.start = event.start
+        if (currentEvent.start !== event.start) {
+          currentEvent.start = event.start
           flag = true
         }
-        if (cerEvent.end !== event.end) {
-          cerEvent.end = event.end
+        if (currentEvent.end !== event.end) {
+          currentEvent.end = event.end
           flag = true
         }
         if (flag) {
@@ -428,5 +479,14 @@
 <style scoped>
   .v-text-field >>> input[type="color"] {
       padding: 0;
+  }
+  header >>> .searchForm {
+    position: relative;
+    width: 500px;
+  }
+  header >>> .searchBar {
+    position: absolute;
+    z-index: 10000000;
+    background: #ffffff;
   }
 </style>
